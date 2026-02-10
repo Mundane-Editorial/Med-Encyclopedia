@@ -4,7 +4,7 @@ export default async function sitemap() {
   const compounds = await fetchAllCompounds();
   const medicines = await fetchAllMedicines();
 
-  const base = "https://yourdomain.com";
+  const base = "https://med-e";
 
   return [
     { url: base, lastModified: new Date() },

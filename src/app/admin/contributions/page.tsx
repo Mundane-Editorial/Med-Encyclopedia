@@ -16,7 +16,10 @@ interface Contribution {
   userEmail?: string;
   status: "pending" | "approved" | "rejected";
   adminNotes?: string;
-  acceptedBy?: string;
+  acceptedBy?: {
+    adminId: string | null;
+    name: string;
+  } | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -68,7 +71,11 @@ export default function ContributionsPage() {
     }
   };
 
-  const handleStatusUpdate = async (id, newStatus, notes) => {
+  const handleStatusUpdate = async (
+    id: string,
+    newStatus: "approved" | "rejected",
+    notes?: string,
+  ) => {
     if (!adminName.trim()) {
       setIsInvalidName(true);
       toast.error("Please enter your name before proceeding.");
@@ -376,7 +383,7 @@ export default function ContributionsPage() {
                           : "Rejected"}{" "}
                         by:
                       </strong>{" "}
-                      {selectedContribution.acceptedBy.name}
+                      {selectedContribution.acceptedBy?.name}
                     </p>
                   </div>
                 )

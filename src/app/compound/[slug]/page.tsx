@@ -5,13 +5,16 @@ import connectDB from '@/lib/mongodb';
 import Compound from '@/models/Compound';
 import Medicine from '@/models/Medicine';
 
+export const dynamic = 'force-dynamic';
+
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
   await connectDB();
-  const compound = await Compound.findOne({ slug: params.slug }).lean();
+  const compound = await Compound.findOne({ slug }).lean();
 
   if (!compound) {
     return {
@@ -46,7 +49,8 @@ async function getCompound(slug: string) {
 }
 
 export default async function CompoundPage({ params }: Props) {
-  const compound = await getCompound(params.slug);
+  const { slug } = await params;
+  const compound = await getCompound(slug);
 
   if (!compound) {
     notFound();

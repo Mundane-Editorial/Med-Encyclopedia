@@ -1,24 +1,27 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import connectDB from '@/lib/mongodb';
-import Compound from '@/models/Compound';
-import { generateSlug, validateSafeContent } from '@/lib/utils';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
+import connectDB from "@/lib/mongodb";
+import Compound from "@/models/Compound";
+import { generateSlug, validateSafeContent } from "@/lib/utils";
 
 // GET single compound
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     await connectDB();
 
-    const compound = await Compound.findById(params.id).populate('related_medicines');
+    const compound = await Compound.findById(id).populate(
+      "related_medicines",
+    );
 
     if (!compound) {
       return NextResponse.json(
-        { success: false, error: 'Compound not found' },
-        { status: 404 }
+        { success: false, error: "Compound not found" },
+        { status: 404 },
       );
     }
 
@@ -26,7 +29,7 @@ export async function GET(
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -34,15 +37,16 @@ export async function GET(
 // PUT update compound (protected)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session) {
       return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
       );
     }
 
@@ -54,8 +58,11 @@ export async function PUT(
     const contentToValidate = `${body.description} ${body.mechanism_of_action} ${body.warnings}`;
     if (!validateSafeContent(contentToValidate)) {
       return NextResponse.json(
-        { success: false, error: 'Content contains prohibited synthesis information' },
-        { status: 400 }
+        {
+          success: false,
+          error: "Content contains prohibited synthesis information",
+        },
+        { status: 400 },
       );
     }
 
@@ -64,15 +71,15 @@ export async function PUT(
       body.slug = generateSlug(body.name);
     }
 
-    const compound = await Compound.findByIdAndUpdate(params.id, body, {
+    const compound = await Compound.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
     });
 
     if (!compound) {
       return NextResponse.json(
-        { success: false, error: 'Compound not found' },
-        { status: 404 }
+        { success: false, error: "Compound not found" },
+        { status: 404 },
       );
     }
 
@@ -80,7 +87,7 @@ export async function PUT(
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -88,26 +95,27 @@ export async function PUT(
 // DELETE compound (protected)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session) {
       return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
       );
     }
 
     await connectDB();
 
-    const compound = await Compound.findByIdAndDelete(params.id);
+    const compound = await Compound.findByIdAndDelete(id);
 
     if (!compound) {
       return NextResponse.json(
-        { success: false, error: 'Compound not found' },
-        { status: 404 }
+        { success: false, error: "Compound not found" },
+        { status: 404 },
       );
     }
 
@@ -115,7 +123,7 @@ export async function DELETE(
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

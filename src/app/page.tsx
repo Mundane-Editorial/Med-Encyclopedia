@@ -5,6 +5,8 @@ import connectDB from '@/lib/mongodb';
 import Compound from '@/models/Compound';
 import Medicine from '@/models/Medicine';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'MedEncyclopedia - Medicine & Compound Information',
   description:

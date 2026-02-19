@@ -16,6 +16,7 @@ interface Contribution {
   userEmail?: string;
   status: "pending" | "approved" | "rejected";
   adminNotes?: string;
+  acceptedBy?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -30,6 +31,9 @@ export default function ContributionsPage() {
   >("all");
   const [selectedContribution, setSelectedContribution] =
     useState<Contribution | null>(null);
+
+  const [adminName, setAdminName] = useState("");
+  const [isInvalidName, setIsInvalidName] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -64,22 +68,33 @@ export default function ContributionsPage() {
     }
   };
 
-  const handleStatusUpdate = async (
-    id: string,
-    newStatus: "approved" | "rejected",
-    notes?: string,
-  ) => {
+  const handleStatusUpdate = async (id, newStatus, notes) => {
+    if (!adminName.trim()) {
+      setIsInvalidName(true);
+      toast.error("Please enter your name before proceeding.");
+      return;
+    }
+
     try {
       const res = await fetch(`/api/contributions/${id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           status: newStatus,
           adminNotes: notes || "",
+          acceptedBy: {
+            adminId: null,
+            name: adminName,
+          },
         }),
       });
+
+      if (res.status === 403) {
+        const error = await res.json().catch(() => null);
+        setIsInvalidName(true); // 🔥 shake + red
+        toast.error(error?.message || "You are not allowed to approve this.");
+        return;
+      }
 
       const data = await res.json();
 
@@ -87,6 +102,8 @@ export default function ContributionsPage() {
         toast.success(`Contribution ${newStatus} successfully`);
         fetchContributions();
         setSelectedContribution(null);
+        setAdminName("");
+        setIsInvalidName(false);
       } else {
         toast.error(data.message || "Failed to update contribution");
       }
@@ -243,6 +260,7 @@ export default function ContributionsPage() {
       )}
 
       {/* Modal for viewing full contribution */}
+      {/* Modal for viewing full contribution */}
       {selectedContribution && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -273,7 +291,6 @@ export default function ContributionsPage() {
                 <FiX className="w-5 h-5" />
               </button>
             </div>
-
             {/* Content */}
             <div className="px-6 py-5 space-y-6">
               {/* Meta info */}
@@ -322,17 +339,58 @@ export default function ContributionsPage() {
                   </div>
                 </div>
               )}
-            </div>
 
+              {/* Admin Name Input */}
+              {/* Admin Name / Approved By */}
+              {selectedContribution.status === "pending" ? (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Your Name (required)
+                  </label>
+                  <input
+                    type="text"
+                    className={`w-full border rounded-lg px-3 py-2 transition-all
+                      ${isInvalidName ? "border-red-500 shake" : "border-gray-300"}
+                    `}
+                    placeholder="Type your name before approving/rejecting"
+                    value={adminName}
+                    onChange={(e) => {
+                      setAdminName(e.target.value);
+                      setIsInvalidName(false); // reset as soon as user types
+                    }}
+                  />
+                  {isInvalidName && (
+                    <p className="text-red-500 text-sm mt-1">
+                      You don't have permission to handle changes :)
+                    </p>
+                  )}
+                </div>
+              ) : (
+                selectedContribution.acceptedBy && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <p className="text-sm text-gray-700">
+                      <strong>
+                        {selectedContribution.status === "approved"
+                          ? "Approved"
+                          : "Rejected"}{" "}
+                        by:
+                      </strong>{" "}
+                      {selectedContribution.acceptedBy.name}
+                    </p>
+                  </div>
+                )
+              )}
+            </div>{" "}
             {/* Actions */}
             {selectedContribution.status === "pending" && (
               <div className="px-6 py-4 border-t bg-gray-50 flex gap-3">
                 <Button
                   variant="primary"
+                  disabled={!adminName.trim()}
+                  className="flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() =>
                     handleStatusUpdate(selectedContribution._id, "approved")
                   }
-                  className="flex-1"
                 >
                   <FiCheck className="w-4 h-4 mr-2" />
                   Approve
@@ -340,10 +398,11 @@ export default function ContributionsPage() {
 
                 <Button
                   variant="secondary"
+                  disabled={!adminName.trim()}
+                  className="flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() =>
                     handleStatusUpdate(selectedContribution._id, "rejected")
                   }
-                  className="flex-1"
                 >
                   <FiX className="w-4 h-4 mr-2" />
                   Reject

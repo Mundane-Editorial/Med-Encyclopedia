@@ -2,6 +2,8 @@ import Card from '@/components/Card';
 import connectDB from '@/lib/mongodb';
 import Compound from '@/models/Compound';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'All Compounds - MedEncyclopedia',
   description: 'Browse all chemical compounds and their educational information.',

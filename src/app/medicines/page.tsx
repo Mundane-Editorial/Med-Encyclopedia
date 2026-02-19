@@ -2,6 +2,8 @@ import Card from '@/components/Card';
 import connectDB from '@/lib/mongodb';
 import Medicine from '@/models/Medicine';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'All Medicines - MedEncyclopedia',
   description: 'Browse all medicines and their educational information.',

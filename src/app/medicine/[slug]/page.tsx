@@ -4,13 +4,16 @@ import { notFound } from 'next/navigation';
 import connectDB from '@/lib/mongodb';
 import Medicine from '@/models/Medicine';
 
+export const dynamic = 'force-dynamic';
+
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
   await connectDB();
-  const medicine = await Medicine.findOne({ slug: params.slug })
+  const medicine = await Medicine.findOne({ slug })
     .populate('compound')
     .lean();
 
@@ -45,7 +48,8 @@ async function getMedicine(slug: string) {
 }
 
 export default async function MedicinePage({ params }: Props) {
-  const medicine = await getMedicine(params.slug);
+  const { slug } = await params;
+  const medicine = await getMedicine(slug);
 
   if (!medicine) {
     notFound();

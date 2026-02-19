@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 import connectDB from "@/lib/mongodb";
 import Contribution from "@/models/Contribution";
 import Compound from "@/models/Compound";
@@ -11,11 +11,12 @@ import ApprovedAdmin from "@/models/ApprovedAdmin";
 // GET single contribution
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     await connectDB();
-    const contribution = await Contribution.findById(params.id).lean();
+    const contribution = await Contribution.findById(id).lean();
 
     if (!contribution) {
       return NextResponse.json(
@@ -40,9 +41,10 @@ export async function GET(
 // PUT - Update contribution (approve/reject) - Admin only
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user) {
@@ -64,7 +66,7 @@ export async function PUT(
 
     await connectDB();
 
-    const contribution = await Contribution.findById(params.id);
+    const contribution = await Contribution.findById(id);
 
     if (!contribution) {
       return NextResponse.json(
@@ -174,9 +176,10 @@ export async function PUT(
 // DELETE - Admin only
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user) {
@@ -188,7 +191,7 @@ export async function DELETE(
 
     await connectDB();
 
-    const contribution = await Contribution.findByIdAndDelete(params.id);
+    const contribution = await Contribution.findByIdAndDelete(id);
 
     if (!contribution) {
       return NextResponse.json(

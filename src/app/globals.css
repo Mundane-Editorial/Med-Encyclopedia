@@ -3,96 +3,125 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
-  }
+    :root {
+        --font-inter: "Inter", system-ui, -apple-system, sans-serif;
+    }
 
-  * {
-    @apply border-gray-200;
-  }
+    * {
+        @apply border-gray-200;
+    }
 
-  body {
-    @apply bg-gray-50 text-gray-900 antialiased;
-    font-feature-settings: 'rlig' 1, 'calt' 1;
-  }
+    body {
+        @apply bg-gray-50 text-gray-900 antialiased;
+        font-feature-settings:
+            "rlig" 1,
+            "calt" 1;
+    }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold tracking-tight;
-  }
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply font-semibold tracking-tight;
+    }
 
-  h1 {
-    @apply text-4xl md:text-5xl;
-  }
+    h1 {
+        @apply text-4xl md:text-5xl;
+    }
 
-  h2 {
-    @apply text-3xl md:text-4xl;
-  }
+    h2 {
+        @apply text-3xl md:text-4xl;
+    }
 
-  h3 {
-    @apply text-2xl md:text-3xl;
-  }
+    h3 {
+        @apply text-2xl md:text-3xl;
+    }
 
-  p {
-    @apply leading-relaxed;
-  }
+    p {
+        @apply leading-relaxed;
+    }
 }
 
 @layer components {
-  .container-custom {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
+    .container-custom {
+        @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    }
 
-  .card {
-    @apply bg-white rounded-xl shadow-soft border border-gray-100 transition-all duration-200;
-  }
+    .card {
+        @apply bg-white rounded-xl shadow-soft border border-gray-100 transition-all duration-200;
+    }
 
-  .card-hover {
-    @apply card hover:shadow-soft-lg hover:-translate-y-0.5;
-  }
+    .card-hover {
+        @apply card hover:shadow-soft-lg hover:-translate-y-0.5;
+    }
 
-  .btn {
-    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
-  }
+    .btn {
+        @apply inline-flex items-center justify-center px-5 py-2.5 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    }
 
-  .btn-primary {
-    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
-  }
+    .btn-primary {
+        @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+    }
 
-  .btn-secondary {
-    @apply btn bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-300;
-  }
+    .btn-secondary {
+        @apply btn bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-300;
+    }
 
-  .btn-outline {
-    @apply btn border-2 border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-300;
-  }
+    .btn-outline {
+        @apply btn border-2 border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-300;
+    }
 
-  .input {
-    @apply w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all;
-  }
+    .input {
+        @apply w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all;
+    }
 
-  .badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
-  }
+    .badge {
+        @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+    }
 
-  .badge-primary {
-    @apply badge bg-primary-100 text-primary-700;
-  }
+    .badge-primary {
+        @apply badge bg-primary-100 text-primary-700;
+    }
 
-  .badge-accent {
-    @apply badge bg-accent-100 text-accent-700;
-  }
+    .badge-accent {
+        @apply badge bg-accent-100 text-accent-700;
+    }
 
-  .badge-gray {
-    @apply badge bg-gray-100 text-gray-700;
-  }
+    .badge-gray {
+        @apply badge bg-gray-100 text-gray-700;
+    }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+    .text-balance {
+        text-wrap: balance;
+    }
 
-  .section-padding {
-    @apply py-12 md:py-16 lg:py-20;
-  }
+    .section-padding {
+        @apply py-12 md:py-16 lg:py-20;
+    }
+}
+
+@keyframes shake {
+    0% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-4px);
+    }
+    50% {
+        transform: translateX(4px);
+    }
+    75% {
+        transform: translateX(-4px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.shake {
+    animation: shake 0.3s ease-in-out;
 }

@@ -361,7 +361,8 @@ export default function ContributionsPage() {
                   />
                   {isInvalidName && (
                     <p className="text-red-500 text-sm mt-1">
-                      You don't have permission to handle changes :)
+                      HOO LEE SHEET!! You don't have permission to handle
+                      changes.
                     </p>
                   )}
                 </div>

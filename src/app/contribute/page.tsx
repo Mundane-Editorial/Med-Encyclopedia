@@ -36,7 +36,9 @@ export default function ContributePage() {
 
   const [formData, setFormData] = useState({
     type: "compound" as ContributionType,
-
+    title: "",
+    description: "",
+    userEmail: "",
     // compounds & corrections
     name: "",
     chemical_class: "",
@@ -228,7 +230,8 @@ export default function ContributePage() {
         toast.success("Your contribution has been submitted!");
 
         // Reset
-        setFormData({
+        setFormData((prev) => ({
+          ...prev,
           type: "compound",
           title: "",
           description: "",
@@ -245,7 +248,7 @@ export default function ContributePage() {
           general_dosage_info: "",
           interactions: "",
           safety_info: "",
-        });
+        }));
 
         setCorrectionType("");
         setCorrectionTarget("");
@@ -306,6 +309,29 @@ export default function ContributePage() {
                   ))}
                 </div>
               </div>
+
+              {/* Title & Description (required for all types) */}
+              <Input
+                label="Title"
+                value={formData.title}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
+                error={errors.title}
+                placeholder="e.g. Add Aspirin, Correction for Ibuprofen"
+                required
+              />
+              <Textarea
+                label="Description / Summary"
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                error={errors.description}
+                placeholder="Brief description of your contribution (min 20 characters)"
+                required
+              />
+
               {/* --------------------------- */}
               {/* NEW COMPOUND FORM */}
               {/* --------------------------- */}
@@ -752,7 +778,7 @@ export default function ContributePage() {
                 </p>
               </div>
 
-              {/* EMAIL */}
+              {/* EMAIL (optional) */}
               <Input
                 label="Your Email (optional)"
                 value={formData.userEmail}

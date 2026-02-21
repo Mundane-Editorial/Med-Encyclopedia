@@ -22,6 +22,27 @@ interface Contribution {
   } | null;
   createdAt: string;
   updatedAt: string;
+
+  correctionType?: "compound" | "medicine";
+  correctionTarget?: string;
+
+  // dynamic fields
+  name?: string;
+  chemical_class?: string;
+  mechanism_of_action?: string;
+  common_uses?: string[] | string;
+  common_side_effects?: string[] | string;
+  warnings?: string;
+
+  compound?: string;
+  brand_names?: string[] | string;
+  general_usage_info?: string;
+  general_dosage_info?: string;
+  interactions?: string;
+  safety_info?: string;
+
+  // ⭐ ADD THIS — fixes your error
+  [key: string]: any;
 }
 
 export default function ContributionsPage() {
@@ -155,6 +176,73 @@ export default function ContributionsPage() {
     return badges[type as keyof typeof badges] || "bg-gray-100 text-gray-700";
   };
 
+  // Field labels for modal display
+  const FIELD_LABELS: Record<string, string> = {
+    name: "Name",
+    chemical_class: "Chemical class",
+    mechanism_of_action: "Mechanism of action",
+    common_uses: "Common uses",
+    common_side_effects: "Common side effects",
+    warnings: "Warnings",
+    compound: "Related compound",
+    brand_names: "Brand names",
+    general_usage_info: "General usage info",
+    general_dosage_info: "General dosage info",
+    interactions: "Interactions",
+    safety_info: "Safety info",
+  };
+
+  const getSubmittedFieldsForModal = (c: Contribution) => {
+    const isCompound =
+      c.type === "compound" || c.correctionType === "compound";
+    const isMedicine =
+      c.type === "medicine" || c.correctionType === "medicine";
+    const compoundFields = [
+      "name",
+      "chemical_class",
+      "mechanism_of_action",
+      "common_uses",
+      "common_side_effects",
+      "warnings",
+    ];
+    const medicineFields = [
+      "name",
+      "compound",
+      "brand_names",
+      "general_usage_info",
+      "general_dosage_info",
+      "interactions",
+      "safety_info",
+    ];
+    const keys = isCompound ? compoundFields : isMedicine ? medicineFields : [];
+    return keys
+      .map((key) => {
+        const value = c[key as keyof Contribution];
+        if (value === undefined || value === null) return null;
+        if (typeof value === "string" && !value.trim()) return null;
+        if (Array.isArray(value) && value.length === 0) return null;
+        const label = FIELD_LABELS[key] || key.replace(/_/g, " ");
+        return { key, label, value };
+      })
+      .filter((x): x is { key: string; label: string; value: unknown } =>
+        Boolean(x),
+      );
+  };
+
+  const getModalSubtitle = (c: Contribution) => {
+    if (c.type === "correction") {
+      const target =
+        c.correctionTarget || c.relatedId;
+      const typeLabel = c.correctionType
+        ? `${c.correctionType.charAt(0).toUpperCase() + c.correctionType.slice(1)}`
+        : "Item";
+      return target ? `Correction for ${typeLabel} (${target})` : "Correction";
+    }
+    if (c.type === "compound") return "New compound";
+    if (c.type === "medicine") return "New medicine";
+    return null;
+  };
+
   return (
     <div>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
@@ -267,7 +355,11 @@ export default function ContributionsPage() {
       )}
 
       {/* Modal for viewing full contribution */}
-      {selectedContribution && (
+      {selectedContribution && (() => {
+        const submittedFields = getSubmittedFieldsForModal(selectedContribution);
+        const hasSubmittedFields = submittedFields.length > 0;
+        const modalSubtitle = getModalSubtitle(selectedContribution);
+        return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
             {/* Header */}
@@ -276,8 +368,10 @@ export default function ContributionsPage() {
                 <h2 className="text-xl font-semibold text-gray-900">
                   {selectedContribution.title}
                 </h2>
-
-                <div className="flex gap-2 mt-2">
+                {modalSubtitle && (
+                  <p className="text-sm text-gray-500 mt-1">{modalSubtitle}</p>
+                )}
+                <div className="flex flex-wrap gap-2 mt-2">
                   <span
                     className={`badge ${getTypeBadge(selectedContribution.type)}`}
                   >
@@ -287,6 +381,14 @@ export default function ContributionsPage() {
                     className={`badge ${getStatusBadge(selectedContribution.status)}`}
                   >
                     {selectedContribution.status}
+                  </span>
+                  {selectedContribution.userEmail && (
+                    <span className="text-xs text-gray-500">
+                      {selectedContribution.userEmail}
+                    </span>
+                  )}
+                  <span className="text-xs text-gray-400">
+                    {new Date(selectedContribution.createdAt).toLocaleDateString()}
                   </span>
                 </div>
               </div>
@@ -300,58 +402,33 @@ export default function ContributionsPage() {
             </div>
 
             {/* Content */}
-            <div className="px-6 py-5 space-y-6">
-              {/* Meta Section */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                {selectedContribution.userEmail && (
-                  <div>
-                    <p className="text-gray-500">Email</p>
-                    <p className="font-medium">
-                      {selectedContribution.userEmail}
-                    </p>
-                  </div>
-                )}
-
-                {/* Correction: target type */}
-                {selectedContribution.correctionType && (
-                  <div>
-                    <p className="text-gray-500">Correction For</p>
-                    <p className="capitalize font-medium">
-                      {selectedContribution.correctionType}
-                    </p>
-                  </div>
-                )}
-
-                {/* Correction: target item */}
-                {selectedContribution.correctionTarget && (
-                  <div>
-                    <p className="text-gray-500">Correcting Item</p>
-                    <p
-                      className="text-blue-600 underline cursor-pointer"
-                      onClick={() =>
+            <div className="px-6 py-5 space-y-5">
+              {/* Correction: link to target (only for corrections) */}
+              {selectedContribution.type === "correction" &&
+                (selectedContribution.correctionTarget ||
+                  selectedContribution.relatedId) && (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm text-gray-500">Correcting:</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const targetId =
+                          selectedContribution.correctionTarget ||
+                          selectedContribution.relatedId;
+                        const cType =
+                          selectedContribution.correctionType || "compound";
                         router.push(
-                          selectedContribution.correctionType === "compound"
-                            ? `/admin/compounds/${selectedContribution.correctionTarget}`
-                            : `/admin/medicines/${selectedContribution.correctionTarget}`,
-                        )
-                      }
+                          cType === "compound"
+                            ? `/admin/compounds/${targetId}`
+                            : `/admin/medicines/${targetId}`,
+                        );
+                      }}
+                      className="text-sm text-primary-600 hover:text-primary-700 underline"
                     >
-                      {selectedContribution.correctionTarget}
-                    </p>
+                      View {selectedContribution.correctionType || "item"} →
+                    </button>
                   </div>
                 )}
-
-                {/* For NEW medicine: show compound ID */}
-                {selectedContribution.type === "medicine" &&
-                  selectedContribution.compound && (
-                    <div>
-                      <p className="text-gray-500">Compound</p>
-                      <p className="text-gray-800">
-                        {selectedContribution.compound}
-                      </p>
-                    </div>
-                  )}
-              </div>
 
               {/* Description */}
               <div>
@@ -359,78 +436,32 @@ export default function ContributionsPage() {
                   Description
                 </h3>
                 <div className="bg-gray-50 border rounded-lg p-4">
-                  <p className="whitespace-pre-wrap text-gray-700">
+                  <p className="whitespace-pre-wrap text-gray-700 text-sm">
                     {selectedContribution.description}
                   </p>
                 </div>
               </div>
 
-              {/* CONTRIBUTED FIELDS */}
-              <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-3">
-                  Submitted Fields
-                </h3>
-
-                <div className="bg-gray-50 border rounded-lg p-4 space-y-3 text-sm">
-                  {/* COMPOUND FIELDS */}
-                  {(selectedContribution.type === "compound" ||
-                    selectedContribution.correctionType === "compound") && (
-                    <>
-                      {[
-                        "name",
-                        "chemical_class",
-                        "mechanism_of_action",
-                        "common_uses",
-                        "common_side_effects",
-                        "warnings",
-                      ].map((field) => {
-                        const value = selectedContribution[field];
-                        if (!value || value.length === 0) return null;
-
-                        return (
-                          <div key={field}>
-                            <p className="font-semibold capitalize">
-                              {field.replace(/_/g, " ")}
-                            </p>
-                            <p className="ml-1 whitespace-pre-wrap">
-                              {Array.isArray(value) ? value.join("\n") : value}
-                            </p>
-                          </div>
-                        );
-                      })}
-                    </>
-                  )}
-
-                  {/* MEDICINE FIELDS */}
-                  {(selectedContribution.type === "medicine" ||
-                    selectedContribution.correctionType === "medicine") && (
-                    <>
-                      {[
-                        "name",
-                        "brand_names",
-                        "general_usage_info",
-                        "general_dosage_info",
-                        "interactions",
-                        "safety_info",
-                      ].map((field) => {
-                        const value = selectedContribution[field];
-                        if (!value || value.length === 0) return null;
-
-                        return (
-                          <div key={field}>
-                            <p className="font-semibold capitalize">
-                              {field.replace(/_/g, " ")}
-                            </p>
-                            <p className="ml-1 whitespace-pre-wrap">
-                              {Array.isArray(value) ? value.join("\n") : value}
-                            </p>
-                          </div>
-                        );
-                      })}
-                    </>
-                  )}
+              {/* Submitted data: only when we have stored fields */}
+              {hasSubmittedFields && (
+                <div>
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">
+                    Submitted data
+                  </h3>
+                  <div className="bg-gray-50 border rounded-lg divide-y divide-gray-200">
+                    {submittedFields.map(({ key, label, value }) => (
+                      <div key={key} className="px-4 py-3">
+                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                          {label}
+                        </p>
+                        <p className="text-sm text-gray-800 whitespace-pre-wrap">
+                          {Array.isArray(value) ? value.join(", ") : String(value)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* ADMIN NOTES */}
               {selectedContribution.adminNotes && (
@@ -510,7 +541,8 @@ export default function ContributionsPage() {
             )}
           </div>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

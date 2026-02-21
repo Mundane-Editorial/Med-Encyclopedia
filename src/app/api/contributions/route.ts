@@ -6,7 +6,27 @@ import { validateSafeContent } from "@/lib/utils";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { type, title, description, relatedId, userEmail } = body;
+    const {
+      type,
+      title,
+      description,
+      relatedId,
+      userEmail,
+      correctionType,
+      correctionTarget,
+      name,
+      chemical_class,
+      mechanism_of_action,
+      common_uses,
+      common_side_effects,
+      warnings,
+      compound,
+      brand_names,
+      general_usage_info,
+      general_dosage_info,
+      interactions,
+      safety_info,
+    } = body;
 
     // Validation
     if (!type || !["compound", "medicine", "correction"].includes(type)) {
@@ -72,14 +92,46 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    // Create contribution
+    // For corrections, use correctionTarget as relatedId
+    const finalRelatedId =
+      type === "correction" && correctionTarget
+        ? correctionTarget.trim()
+        : relatedId?.trim() || undefined;
+
+    // Ensure arrays for multi-value fields
+    const toArray = (v: unknown): string[] | undefined => {
+      if (Array.isArray(v)) return v.map((x) => String(x).trim()).filter(Boolean);
+      if (typeof v === "string" && v.trim()) return v.split("\n").map((s) => s.trim()).filter(Boolean);
+      return undefined;
+    };
+
     const contribution = await Contribution.create({
       type,
       title: title.trim(),
       description: description.trim(),
-      relatedId: relatedId?.trim() || undefined,
+      relatedId: finalRelatedId,
       userEmail: userEmail?.trim() || undefined,
       status: "pending",
+      correctionType:
+        type === "correction" && ["compound", "medicine"].includes(correctionType)
+          ? correctionType
+          : undefined,
+      correctionTarget:
+        type === "correction" && correctionTarget
+          ? String(correctionTarget).trim()
+          : undefined,
+      name: name?.trim() || undefined,
+      chemical_class: chemical_class?.trim() || undefined,
+      mechanism_of_action: mechanism_of_action?.trim() || undefined,
+      common_uses: toArray(common_uses),
+      common_side_effects: toArray(common_side_effects),
+      warnings: warnings?.trim() || undefined,
+      compound: compound?.trim() || undefined,
+      brand_names: toArray(brand_names),
+      general_usage_info: general_usage_info?.trim() || undefined,
+      general_dosage_info: general_dosage_info?.trim() || undefined,
+      interactions: interactions?.trim() || undefined,
+      safety_info: safety_info?.trim() || undefined,
     });
 
     return NextResponse.json(

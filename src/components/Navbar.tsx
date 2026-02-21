@@ -11,7 +11,40 @@ export default function Navbar() {
     <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-100 sticky top-0 z-50">
       <div className="container-custom">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="flex items-center group">
+          <Link href="/" className="flex items-center gap-2 group">
+            <svg
+              className="w-8 h-8 text-primary-600 group-hover:text-primary-700 transition-colors flex-shrink-0"
+              viewBox="0 0 40 40"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden
+            >
+              <rect
+                x="6"
+                y="14"
+                width="28"
+                height="12"
+                rx="6"
+                fill="currentColor"
+                opacity="0.9"
+              />
+              <rect
+                x="8"
+                y="16"
+                width="24"
+                height="8"
+                rx="4"
+                fill="white"
+                opacity="0.3"
+              />
+              <path
+                d="M12 10v4M28 10v4M20 6v4"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                opacity="0.8"
+              />
+            </svg>
             <span className="text-xl font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
               MedEncyclopedia
             </span>

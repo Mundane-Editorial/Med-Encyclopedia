@@ -42,10 +42,45 @@ export default function AdminNav() {
         overflow-hidden
       "
     >
-      {/* Header */}
-      <div className="p-4">
-        <h1 className="text-xl font-semibold text-gray-900">Admin Panel</h1>
-        <p className="text-sm text-gray-500 mt-1">Content Management</p>
+      {/* Header with logo */}
+      <div className="p-4 flex items-center gap-3">
+        <svg
+          className="w-8 h-8 text-primary-600 flex-shrink-0"
+          viewBox="0 0 40 40"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden
+        >
+          <rect
+            x="6"
+            y="14"
+            width="28"
+            height="12"
+            rx="6"
+            fill="currentColor"
+            opacity="0.9"
+          />
+          <rect
+            x="8"
+            y="16"
+            width="24"
+            height="8"
+            rx="4"
+            fill="white"
+            opacity="0.3"
+          />
+          <path
+            d="M12 10v4M28 10v4M20 6v4"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            opacity="0.8"
+          />
+        </svg>
+        <div>
+          <h1 className="text-xl font-semibold text-gray-900">Admin Panel</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Content Management</p>
+        </div>
       </div>
 
       {/* Navigation (scrollable) */}

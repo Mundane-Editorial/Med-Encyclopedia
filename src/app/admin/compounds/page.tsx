@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import toast, { Toaster } from 'react-hot-toast';
-import { FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi';
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import toast, { Toaster } from "react-hot-toast";
+import { FiPlus, FiEdit, FiTrash2 } from "react-icons/fi";
 
 interface Compound {
   _id: string;
@@ -22,8 +22,8 @@ export default function CompoundsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/admin/login');
+    if (status === "unauthenticated") {
+      router.push("/admin/login");
     }
   }, [status, router]);
 
@@ -33,34 +33,34 @@ export default function CompoundsPage() {
 
   const fetchCompounds = async () => {
     try {
-      const res = await fetch('/api/compounds');
+      const res = await fetch("/api/compounds");
       const data = await res.json();
       if (data.success) {
         setCompounds(data.data);
       }
     } catch (error) {
-      toast.error('Failed to fetch compounds');
+      toast.error("Failed to fetch compounds");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this compound?')) return;
+    if (!confirm("Are you sure you want to delete this compound?")) return;
 
     try {
       const res = await fetch(`/api/compounds/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (res.ok) {
-        toast.success('Compound deleted successfully');
+        toast.success("Compound deleted successfully");
         fetchCompounds();
       } else {
-        toast.error('Failed to delete compound');
+        toast.error("Failed to delete compound");
       }
     } catch (error) {
-      toast.error('An error occurred');
+      toast.error("An error occurred");
     }
   };
 
@@ -116,7 +116,9 @@ export default function CompoundsPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{compound.chemical_class}</div>
+                    <div className="text-sm text-gray-500">
+                      {compound.chemical_class}
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm text-gray-500 line-clamp-2">

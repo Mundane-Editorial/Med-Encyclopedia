@@ -267,16 +267,16 @@ export default function ContributionsPage() {
       )}
 
       {/* Modal for viewing full contribution */}
-      {/* Modal for viewing full contribution */}
       {selectedContribution && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="flex items-start justify-between px-6 py-4 border-b">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">
                   {selectedContribution.title}
                 </h2>
+
                 <div className="flex gap-2 mt-2">
                   <span
                     className={`badge ${getTypeBadge(selectedContribution.type)}`}
@@ -298,27 +298,59 @@ export default function ContributionsPage() {
                 <FiX className="w-5 h-5" />
               </button>
             </div>
+
             {/* Content */}
             <div className="px-6 py-5 space-y-6">
-              {/* Meta info */}
+              {/* Meta Section */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 {selectedContribution.userEmail && (
                   <div>
                     <p className="text-gray-500">Email</p>
-                    <p className="text-gray-800 font-medium">
+                    <p className="font-medium">
                       {selectedContribution.userEmail}
                     </p>
                   </div>
                 )}
 
-                {selectedContribution.relatedId && (
+                {/* Correction: target type */}
+                {selectedContribution.correctionType && (
                   <div>
-                    <p className="text-gray-500">Related ID</p>
-                    <p className="text-gray-800 font-medium">
-                      {selectedContribution.relatedId}
+                    <p className="text-gray-500">Correction For</p>
+                    <p className="capitalize font-medium">
+                      {selectedContribution.correctionType}
                     </p>
                   </div>
                 )}
+
+                {/* Correction: target item */}
+                {selectedContribution.correctionTarget && (
+                  <div>
+                    <p className="text-gray-500">Correcting Item</p>
+                    <p
+                      className="text-blue-600 underline cursor-pointer"
+                      onClick={() =>
+                        router.push(
+                          selectedContribution.correctionType === "compound"
+                            ? `/admin/compounds/${selectedContribution.correctionTarget}`
+                            : `/admin/medicines/${selectedContribution.correctionTarget}`,
+                        )
+                      }
+                    >
+                      {selectedContribution.correctionTarget}
+                    </p>
+                  </div>
+                )}
+
+                {/* For NEW medicine: show compound ID */}
+                {selectedContribution.type === "medicine" &&
+                  selectedContribution.compound && (
+                    <div>
+                      <p className="text-gray-500">Compound</p>
+                      <p className="text-gray-800">
+                        {selectedContribution.compound}
+                      </p>
+                    </div>
+                  )}
               </div>
 
               {/* Description */}
@@ -327,75 +359,134 @@ export default function ContributionsPage() {
                   Description
                 </h3>
                 <div className="bg-gray-50 border rounded-lg p-4">
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  <p className="whitespace-pre-wrap text-gray-700">
                     {selectedContribution.description}
                   </p>
                 </div>
               </div>
 
-              {/* Admin Notes */}
+              {/* CONTRIBUTED FIELDS */}
+              <div>
+                <h3 className="text-sm font-medium text-gray-700 mb-3">
+                  Submitted Fields
+                </h3>
+
+                <div className="bg-gray-50 border rounded-lg p-4 space-y-3 text-sm">
+                  {/* COMPOUND FIELDS */}
+                  {(selectedContribution.type === "compound" ||
+                    selectedContribution.correctionType === "compound") && (
+                    <>
+                      {[
+                        "name",
+                        "chemical_class",
+                        "mechanism_of_action",
+                        "common_uses",
+                        "common_side_effects",
+                        "warnings",
+                      ].map((field) => {
+                        const value = selectedContribution[field];
+                        if (!value || value.length === 0) return null;
+
+                        return (
+                          <div key={field}>
+                            <p className="font-semibold capitalize">
+                              {field.replace(/_/g, " ")}
+                            </p>
+                            <p className="ml-1 whitespace-pre-wrap">
+                              {Array.isArray(value) ? value.join("\n") : value}
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </>
+                  )}
+
+                  {/* MEDICINE FIELDS */}
+                  {(selectedContribution.type === "medicine" ||
+                    selectedContribution.correctionType === "medicine") && (
+                    <>
+                      {[
+                        "name",
+                        "brand_names",
+                        "general_usage_info",
+                        "general_dosage_info",
+                        "interactions",
+                        "safety_info",
+                      ].map((field) => {
+                        const value = selectedContribution[field];
+                        if (!value || value.length === 0) return null;
+
+                        return (
+                          <div key={field}>
+                            <p className="font-semibold capitalize">
+                              {field.replace(/_/g, " ")}
+                            </p>
+                            <p className="ml-1 whitespace-pre-wrap">
+                              {Array.isArray(value) ? value.join("\n") : value}
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* ADMIN NOTES */}
               {selectedContribution.adminNotes && (
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">
+                  <h3 className="text-sm font-medium mb-2 text-gray-700">
                     Admin Notes
                   </h3>
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                    <p className="whitespace-pre-wrap">
                       {selectedContribution.adminNotes}
                     </p>
                   </div>
                 </div>
               )}
 
-              {/* Admin Name Input */}
-              {/* Admin Name / Approved By */}
+              {/* Admin Name */}
               {selectedContribution.status === "pending" ? (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium mb-1">
                     Your Name (required)
                   </label>
                   <input
-                    type="text"
-                    className={`w-full border rounded-lg px-3 py-2 transition-all
-                      ${isInvalidName ? "border-red-500 shake" : "border-gray-300"}
-                    `}
-                    placeholder="Type your name before approving/rejecting"
+                    className={`w-full border rounded-lg px-3 py-2 ${
+                      isInvalidName ? "border-red-500 shake" : "border-gray-300"
+                    }`}
                     value={adminName}
                     onChange={(e) => {
                       setAdminName(e.target.value);
-                      setIsInvalidName(false); // reset as soon as user types
+                      setIsInvalidName(false);
                     }}
                   />
-                  {isInvalidName && (
-                    <p className="text-red-500 text-sm mt-1">
-                      HOO LEE SHEET!! You don't have permission to handle
-                      changes.
-                    </p>
-                  )}
                 </div>
               ) : (
                 selectedContribution.acceptedBy && (
                   <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                    <p className="text-sm text-gray-700">
+                    <p className="text-sm">
                       <strong>
                         {selectedContribution.status === "approved"
                           ? "Approved"
                           : "Rejected"}{" "}
                         by:
                       </strong>{" "}
-                      {selectedContribution.acceptedBy?.name}
+                      {selectedContribution.acceptedBy.name}
                     </p>
                   </div>
                 )
               )}
-            </div>{" "}
-            {/* Actions */}
+            </div>
+
+            {/* ACTION BUTTONS */}
             {selectedContribution.status === "pending" && (
               <div className="px-6 py-4 border-t bg-gray-50 flex gap-3">
                 <Button
                   variant="primary"
                   disabled={!adminName.trim()}
-                  className="flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1"
                   onClick={() =>
                     handleStatusUpdate(selectedContribution._id, "approved")
                   }
@@ -407,7 +498,7 @@ export default function ContributionsPage() {
                 <Button
                   variant="secondary"
                   disabled={!adminName.trim()}
-                  className="flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1"
                   onClick={() =>
                     handleStatusUpdate(selectedContribution._id, "rejected")
                   }

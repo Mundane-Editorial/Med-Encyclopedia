@@ -13,6 +13,7 @@ A comprehensive, production-ready educational platform providing structured info
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
+- [SEO & Discoverability](#seo--discoverability)
 - [Database Setup](#database-setup)
 - [Running the Application](#running-the-application)
 - [Admin Panel](#admin-panel)
@@ -40,11 +41,14 @@ A comprehensive, production-ready educational platform providing structured info
 - ✅ **Content Validation** to prevent harmful information
 - 🔄 **Auto-slug Generation** for SEO-friendly URLs
 
-### SEO & Performance
-- 📈 **SEO Optimized** with metadata and structured data (JSON-LD)
-- 🚀 **Fast Loading** with static generation where possible
-- 🔍 **Search Engine Friendly** URLs and sitemaps
-- 📱 **Mobile Optimized** with responsive design
+### SEO & Discoverability
+- 📈 **Full SEO stack**: metadata, Open Graph, Twitter cards, canonical URLs
+- 🗺️ **XML Sitemap** including all compounds, medicines, and static pages
+- 🤖 **robots.txt** with sitemap reference and admin/api disallow
+- 📋 **JSON-LD** (Organization, WebSite, MedicalWebPage, Drug) for rich results
+- 🔍 **SearchAction** for sitelinks search box
+- 📱 **Web app manifest** for PWA-style discoverability
+- 📄 **Per-page metadata** on every public route
 
 ### Safety Features
 - ⛔ **Content Validation** prevents synthesis instructions
@@ -181,6 +185,10 @@ MONGODB_URI=mongodb://localhost:27017/medicine-encyclopedia
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your-super-secret-key-change-this-in-production
 
+# Public site URL (required for SEO: sitemap, robots, canonical URLs, Open Graph)
+# Use your production domain, e.g. https://medencyclopedia.com
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
 # Admin Credentials (for seeding)
 ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=changeme123
@@ -191,6 +199,20 @@ ADMIN_PASSWORD=changeme123
 ```bash
 openssl rand -base64 32
 ```
+
+---
+
+## 🔍 SEO & Discoverability
+
+The site is set up for search engine and social discoverability:
+
+- **Sitemap:** `/sitemap.xml` — all public URLs (home, compounds, medicines, compound/medicine detail pages, contribute, search, disclaimer, privacy).
+- **Robots:** `/robots.txt` — allows crawling of public pages; disallows `/admin/` and `/api/`.
+- **Canonical URLs:** Every page has a canonical URL to avoid duplicate content.
+- **Structured data:** Organization and WebSite (with SearchAction) on the site; MedicalWebPage + Drug on each compound and medicine page.
+- **Metadata:** Title, description, Open Graph, and Twitter cards on all public pages.
+
+**Production:** Set `NEXT_PUBLIC_SITE_URL` to your live domain (e.g. `https://medencyclopedia.com`) so sitemap, robots, and Open Graph URLs are absolute and correct.
 
 ---
 

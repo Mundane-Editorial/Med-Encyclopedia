@@ -2,46 +2,55 @@ import type { MetadataRoute } from 'next';
 import connectDB from '@/lib/mongodb';
 import Compound from '@/models/Compound';
 import Medicine from '@/models/Medicine';
+import { getBaseUrl } from '@/lib/seo';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl =
-    (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(
-      /\/$/,
-      ''
-    );
+  const baseUrl = getBaseUrl();
+  const now = new Date();
 
-  // Static routes
+  // Static routes – important for discoverability
   const routes: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/`,
-      lastModified: new Date(),
+      lastModified: now,
       changeFrequency: 'daily',
       priority: 1,
     },
     {
       url: `${baseUrl}/compounds`,
+      lastModified: now,
       changeFrequency: 'weekly',
-      priority: 0.8,
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/medicines`,
+      lastModified: now,
       changeFrequency: 'weekly',
-      priority: 0.8,
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/contribute`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
     },
     {
       url: `${baseUrl}/search`,
+      lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.6,
     },
     {
       url: `${baseUrl}/disclaimer`,
+      lastModified: now,
       changeFrequency: 'yearly',
-      priority: 0.3,
+      priority: 0.4,
     },
     {
       url: `${baseUrl}/privacy`,
+      lastModified: now,
       changeFrequency: 'yearly',
-      priority: 0.3,
+      priority: 0.4,
     },
   ];
 
@@ -55,20 +64,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ]);
 
     const compoundEntries: MetadataRoute.Sitemap = compounds.map(
-      (compound: any) => ({
+      (compound: { slug: string; updatedAt?: Date }) => ({
         url: `${baseUrl}/compound/${compound.slug}`,
-        lastModified: compound.updatedAt ?? new Date(),
-        changeFrequency: 'weekly',
-        priority: 0.7,
+        lastModified: compound.updatedAt ?? now,
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
       })
     );
 
     const medicineEntries: MetadataRoute.Sitemap = medicines.map(
-      (medicine: any) => ({
+      (medicine: { slug: string; updatedAt?: Date }) => ({
         url: `${baseUrl}/medicine/${medicine.slug}`,
-        lastModified: medicine.updatedAt ?? new Date(),
-        changeFrequency: 'weekly',
-        priority: 0.7,
+        lastModified: medicine.updatedAt ?? now,
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
       })
     );
 

@@ -1,6 +1,16 @@
-export const metadata = {
-  title: 'Privacy Policy - MedEncyclopedia',
-  description: 'Privacy policy for MedEncyclopedia',
+import type { Metadata } from 'next';
+import { SITE_NAME } from '@/lib/seo';
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy',
+  description:
+    'Privacy policy for MedEncyclopedia. How we collect, use, and protect your information when you use our educational medicine and compound database.',
+  openGraph: {
+    title: `Privacy Policy | ${SITE_NAME}`,
+    description: 'Privacy policy for MedEncyclopedia.',
+    url: '/privacy',
+  },
+  alternates: { canonical: '/privacy' },
 };
 
 export default function PrivacyPage() {

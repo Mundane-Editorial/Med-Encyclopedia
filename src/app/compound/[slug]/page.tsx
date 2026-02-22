@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import connectDB from '@/lib/mongodb';
 import Compound from '@/models/Compound';
 import Medicine from '@/models/Medicine';
+import { absoluteUrl, SITE_NAME, truncateMetaDescription } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,20 +18,36 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const compound = await Compound.findOne({ slug }).lean();
 
   if (!compound) {
-    return {
-      title: 'Compound Not Found',
-    };
+    return { title: 'Compound Not Found' };
   }
 
+  const title = `${compound.name} - Compound Information`;
+  const description = truncateMetaDescription(compound.description || '');
+  const canonicalPath = `/compound/${compound.slug}`;
+
   return {
-    title: `${compound.name} - Compound Information | MedEncyclopedia`,
-    description: compound.description,
-    keywords: [compound.name, compound.chemical_class, 'compound', 'medicine'],
+    title,
+    description,
+    keywords: [
+      compound.name,
+      compound.chemical_class,
+      'compound',
+      'medicine',
+      'pharmacy',
+      'drug information',
+    ].filter(Boolean),
     openGraph: {
-      title: compound.name,
-      description: compound.description,
+      title: `${compound.name} | ${SITE_NAME}`,
+      description,
       type: 'article',
+      url: absoluteUrl(canonicalPath),
     },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${compound.name} | ${SITE_NAME}`,
+      description,
+    },
+    alternates: { canonical: canonicalPath },
   };
 }
 
@@ -158,16 +175,27 @@ export default async function CompoundPage({ params }: Props) {
               </div>
             )}
 
-            {/* JSON-LD Structured Data for SEO */}
+            {/* JSON-LD: MedicalWebPage + Drug for rich results */}
             <script
               type="application/ld+json"
               dangerouslySetInnerHTML={{
                 __html: JSON.stringify({
                   '@context': 'https://schema.org',
-                  '@type': 'MedicalEntity',
-                  name: compound.name,
-                  description: compound.description,
-                  identifier: compound._id,
+                  '@graph': [
+                    {
+                      '@type': 'MedicalWebPage',
+                      '@id': absoluteUrl(`/compound/${compound.slug}`),
+                      url: absoluteUrl(`/compound/${compound.slug}`),
+                      name: `${compound.name} - Compound Information`,
+                      description: truncateMetaDescription(compound.description || ''),
+                      mainEntity: {
+                        '@type': 'Drug',
+                        name: compound.name,
+                        description: compound.description,
+                        chemicalClass: compound.chemical_class,
+                      },
+                    },
+                  ],
                 }),
               }}
             />

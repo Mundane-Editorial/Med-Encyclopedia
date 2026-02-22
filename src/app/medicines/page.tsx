@@ -4,9 +4,21 @@ import Medicine from '@/models/Medicine';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata = {
-  title: 'All Medicines - MedEncyclopedia',
-  description: 'Browse all medicines and their educational information.',
+import type { Metadata } from 'next';
+import { SITE_NAME } from '@/lib/seo';
+
+export const metadata: Metadata = {
+  title: 'All Medicines',
+  description:
+    'Browse all medicines with usage, dosage, interactions, and safety information. Educational resource for medications and brand names.',
+  keywords: ['medicines', 'medications', 'drugs', 'pharmacy', 'brand names', 'safety information'],
+  openGraph: {
+    title: `All Medicines | ${SITE_NAME}`,
+    description:
+      'Browse all medicines with usage, dosage, interactions, and safety information.',
+    url: '/medicines',
+  },
+  alternates: { canonical: '/medicines' },
 };
 
 async function getMedicines() {

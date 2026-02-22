@@ -7,10 +7,20 @@ import Medicine from '@/models/Medicine';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata = {
-  title: 'MedEncyclopedia - Medicine & Compound Information',
+import type { Metadata } from 'next';
+import { SITE_NAME } from '@/lib/seo';
+
+export const metadata: Metadata = {
+  title: `${SITE_NAME} - Medicine & Compound Information`,
   description:
-    'Comprehensive educational platform for medicine and compound information. Learn about compounds, medicines, uses, and safety.',
+    'Comprehensive educational platform for medicine and compound information. Learn about compounds, medicines, uses, and safety. For educational purposes only.',
+  openGraph: {
+    title: `${SITE_NAME} - Medicine & Compound Information`,
+    description:
+      'Comprehensive educational platform for medicine and compound information. Learn about compounds, medicines, uses, and safety.',
+    url: '/',
+  },
+  alternates: { canonical: '/' },
 };
 
 async function getPopularData() {

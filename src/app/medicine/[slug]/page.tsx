@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import connectDB from '@/lib/mongodb';
 import Medicine from '@/models/Medicine';
+import { absoluteUrl, SITE_NAME, truncateMetaDescription } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,20 +19,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .lean();
 
   if (!medicine) {
-    return {
-      title: 'Medicine Not Found',
-    };
+    return { title: 'Medicine Not Found' };
   }
 
+  const title = `${medicine.name} - Medicine Information`;
+  const description = truncateMetaDescription(medicine.description || '');
+  const canonicalPath = `/medicine/${medicine.slug}`;
+
   return {
-    title: `${medicine.name} - Medicine Information | MedEncyclopedia`,
-    description: medicine.description,
-    keywords: [medicine.name, ...medicine.brand_names, 'medicine', 'medication'],
+    title,
+    description,
+    keywords: [
+      medicine.name,
+      ...(medicine.brand_names || []),
+      'medicine',
+      'medication',
+      'pharmacy',
+    ].filter(Boolean),
     openGraph: {
-      title: medicine.name,
-      description: medicine.description,
+      title: `${medicine.name} | ${SITE_NAME}`,
+      description,
       type: 'article',
+      url: absoluteUrl(canonicalPath),
     },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${medicine.name} | ${SITE_NAME}`,
+      description,
+    },
+    alternates: { canonical: canonicalPath },
   };
 }
 
@@ -160,17 +176,27 @@ export default async function MedicinePage({ params }: Props) {
               </Link>
             </div>
 
-            {/* JSON-LD Structured Data for SEO */}
+            {/* JSON-LD: MedicalWebPage + Drug for rich results */}
             <script
               type="application/ld+json"
               dangerouslySetInnerHTML={{
                 __html: JSON.stringify({
                   '@context': 'https://schema.org',
-                  '@type': 'Drug',
-                  name: medicine.name,
-                  description: medicine.description,
-                  nonProprietaryName: medicine.compound.name,
-                  identifier: medicine._id,
+                  '@graph': [
+                    {
+                      '@type': 'MedicalWebPage',
+                      '@id': absoluteUrl(`/medicine/${medicine.slug}`),
+                      url: absoluteUrl(`/medicine/${medicine.slug}`),
+                      name: `${medicine.name} - Medicine Information`,
+                      description: truncateMetaDescription(medicine.description || ''),
+                      mainEntity: {
+                        '@type': 'Drug',
+                        name: medicine.name,
+                        description: medicine.description,
+                        nonProprietaryName: medicine.compound?.name,
+                      },
+                    },
+                  ],
                 }),
               }}
             />

@@ -1,6 +1,17 @@
-export const metadata = {
-  title: 'Disclaimer - MedEncyclopedia',
-  description: 'Important disclaimer and terms of use for MedEncyclopedia',
+import type { Metadata } from 'next';
+import { SITE_NAME } from '@/lib/seo';
+
+export const metadata: Metadata = {
+  title: 'Disclaimer',
+  description:
+    'Important disclaimer: MedEncyclopedia is for educational purposes only. Not medical advice. Always consult a healthcare professional.',
+  openGraph: {
+    title: `Disclaimer | ${SITE_NAME}`,
+    description:
+      'Educational use only. Not medical advice. Consult a healthcare professional.',
+    url: '/disclaimer',
+  },
+  alternates: { canonical: '/disclaimer' },
 };
 
 export default function DisclaimerPage() {

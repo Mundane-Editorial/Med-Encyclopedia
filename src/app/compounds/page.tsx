@@ -4,9 +4,21 @@ import Compound from '@/models/Compound';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata = {
-  title: 'All Compounds - MedEncyclopedia',
-  description: 'Browse all chemical compounds and their educational information.',
+import type { Metadata } from 'next';
+import { SITE_NAME } from '@/lib/seo';
+
+export const metadata: Metadata = {
+  title: 'All Compounds',
+  description:
+    'Browse all chemical compounds with mechanism of action, uses, side effects, and safety information. Educational resource for pharmacy and medicine.',
+  keywords: ['compounds', 'chemical compounds', 'pharmacy', 'drug information', 'mechanism of action'],
+  openGraph: {
+    title: `All Compounds | ${SITE_NAME}`,
+    description:
+      'Browse all chemical compounds with mechanism of action, uses, side effects, and safety information.',
+    url: '/compounds',
+  },
+  alternates: { canonical: '/compounds' },
 };
 
 async function getCompounds() {

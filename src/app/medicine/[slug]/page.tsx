@@ -1,11 +1,11 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import connectDB from '@/lib/mongodb';
-import Medicine from '@/models/Medicine';
-import { absoluteUrl, SITE_NAME, truncateMetaDescription } from '@/lib/seo';
+import { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import connectDB from "@/lib/mongodb";
+import Medicine from "@/models/Medicine";
+import { absoluteUrl, SITE_NAME, truncateMetaDescription } from "@/lib/seo";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -14,16 +14,14 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   await connectDB();
-  const medicine = await Medicine.findOne({ slug })
-    .populate('compound')
-    .lean();
+  const medicine = await Medicine.findOne({ slug }).populate("compound").lean();
 
   if (!medicine) {
-    return { title: 'Medicine Not Found' };
+    return { title: "Medicine Not Found" };
   }
 
   const title = `${medicine.name} - Medicine Information`;
-  const description = truncateMetaDescription(medicine.description || '');
+  const description = truncateMetaDescription(medicine.description || "");
   const canonicalPath = `/medicine/${medicine.slug}`;
 
   return {
@@ -32,18 +30,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     keywords: [
       medicine.name,
       ...(medicine.brand_names || []),
-      'medicine',
-      'medication',
-      'pharmacy',
+      "medicine",
+      "medication",
+      "pharmacy",
     ].filter(Boolean),
     openGraph: {
       title: `${medicine.name} | ${SITE_NAME}`,
       description,
-      type: 'article',
+      type: "article",
       url: absoluteUrl(canonicalPath),
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title: `${medicine.name} | ${SITE_NAME}`,
       description,
     },
@@ -54,11 +52,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 async function getMedicine(slug: string) {
   await connectDB();
 
-  const medicine = await Medicine.findOne({ slug }).populate('compound').lean();
+  const medicine = await Medicine.findOne({ slug }).populate("compound").lean();
 
-  if (!medicine) {
-    return null;
-  }
+  if (!medicine) return null;
 
   return JSON.parse(JSON.stringify(medicine));
 }
@@ -67,40 +63,42 @@ export default async function MedicinePage({ params }: Props) {
   const { slug } = await params;
   const medicine = await getMedicine(slug);
 
-  if (!medicine) {
-    notFound();
-  }
+  if (!medicine) notFound();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="section-padding bg-white border-b border-gray-100">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* HEADER */}
+      <div className="section-padding bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
         <div className="container-custom">
           <div className="max-w-4xl">
             <div className="mb-4">
               <Link
                 href={`/compound/${medicine.compound.slug}`}
-                className="badge-primary hover:bg-primary-200 transition-colors inline-block"
+                className="badge-primary hover:bg-primary-200 dark:hover:bg-primary-700/40 transition-colors inline-block"
               >
                 {medicine.compound.name}
               </Link>
             </div>
-            <h1 className="text-4xl md:text-5xl font-semibold text-gray-900 mb-4">
+
+            <h1 className="text-4xl md:text-5xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
               {medicine.name}
             </h1>
-            <p className="text-xl text-gray-600 leading-relaxed">
+
+            <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
               {medicine.description}
             </p>
           </div>
         </div>
       </div>
 
+      {/* BODY */}
       <div className="section-padding">
         <div className="container-custom">
           <div className="max-w-4xl space-y-8">
             {/* Brand Names */}
-            {medicine.brand_names && medicine.brand_names.length > 0 && (
+            {medicine.brand_names?.length > 0 && (
               <div className="card p-8">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
                   Brand Names
                 </h2>
                 <div className="flex flex-wrap gap-2">
@@ -115,82 +113,94 @@ export default async function MedicinePage({ params }: Props) {
 
             {/* General Usage */}
             <div className="card p-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
                 General Usage
               </h2>
-              <p className="text-gray-700 leading-relaxed">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                 {medicine.general_usage_info}
               </p>
             </div>
 
             {/* Dosage Information */}
-            <div className="card p-8 bg-blue-50/50 border-l-4 border-blue-400">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+            <div className="card p-8 bg-blue-50/50 dark:bg-blue-900/20 border-l-4 border-blue-400">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
                 General Dosage Information
               </h2>
-              <p className="text-gray-700 leading-relaxed mb-4">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
                 {medicine.general_dosage_info}
               </p>
-              <p className="text-sm text-gray-600 italic">
-                Always consult your healthcare provider for personalized dosage recommendations.
+              <p className="text-sm text-gray-600 dark:text-gray-400 italic">
+                Always consult your healthcare provider for personalized dosage
+                recommendations.
               </p>
             </div>
 
             {/* Interactions */}
             {medicine.interactions && (
               <div className="card p-8">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
                   Drug Interactions
                 </h2>
-                <p className="text-gray-700 leading-relaxed">{medicine.interactions}</p>
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                  {medicine.interactions}
+                </p>
               </div>
             )}
 
             {/* Safety Information */}
-            <div className="card p-8 border-l-4 border-yellow-400 bg-yellow-50/50">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4 flex items-center">
+            <div className="card p-8 border-l-4 border-yellow-400 bg-yellow-50/50 dark:bg-yellow-900/20">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
                 <span className="mr-2">⚠️</span> Safety Information
               </h2>
-              <p className="text-gray-700 leading-relaxed">{medicine.safety_info}</p>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                {medicine.safety_info}
+              </p>
             </div>
 
             {/* Related Compound */}
             <div className="card p-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
                 Active Compound
               </h2>
+
               <Link
                 href={`/compound/${medicine.compound.slug}`}
                 className="card-hover p-6 block group"
               >
-                <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-200 mb-2 group-hover:text-primary-600 transition-colors">
                   {medicine.compound.name}
                 </h3>
-                <p className="text-gray-600 leading-relaxed mb-4">
+
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
                   {medicine.compound.description}
                 </p>
+
                 <span className="text-primary-600 font-medium text-sm inline-flex items-center gap-1 group-hover:underline">
                   Learn more
-                  <span className="transition-transform group-hover:translate-x-1">→</span>
+                  <span className="transition-transform group-hover:translate-x-1">
+                    →
+                  </span>
                 </span>
               </Link>
             </div>
 
-            {/* JSON-LD: MedicalWebPage + Drug for rich results */}
+            {/* JSON-LD */}
             <script
               type="application/ld+json"
               dangerouslySetInnerHTML={{
                 __html: JSON.stringify({
-                  '@context': 'https://schema.org',
-                  '@graph': [
+                  "@context": "https://schema.org",
+                  "@graph": [
                     {
-                      '@type': 'MedicalWebPage',
-                      '@id': absoluteUrl(`/medicine/${medicine.slug}`),
+                      "@type": "MedicalWebPage",
+                      "@id": absoluteUrl(`/medicine/${medicine.slug}`),
                       url: absoluteUrl(`/medicine/${medicine.slug}`),
                       name: `${medicine.name} - Medicine Information`,
-                      description: truncateMetaDescription(medicine.description || ''),
+                      description: truncateMetaDescription(
+                        medicine.description || "",
+                      ),
                       mainEntity: {
-                        '@type': 'Drug',
+                        "@type": "Drug",
                         name: medicine.name,
                         description: medicine.description,
                         nonProprietaryName: medicine.compound?.name,
@@ -202,11 +212,11 @@ export default async function MedicinePage({ params }: Props) {
             />
 
             {/* Disclaimer */}
-            <div className="card p-6 bg-gray-50 text-center">
-              <p className="text-sm text-gray-600 leading-relaxed">
-                This information is for educational purposes only. Always consult a
-                qualified healthcare professional for medical advice, diagnosis, or
-                treatment.
+            <div className="card p-6 bg-gray-50 dark:bg-gray-800 text-center">
+              <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                This information is for educational purposes only. Always
+                consult a qualified healthcare professional for medical advice,
+                diagnosis, or treatment.
               </p>
             </div>
           </div>

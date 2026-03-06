@@ -266,11 +266,11 @@ export default function ContributePage() {
   // COMPONENT UI
   //------------------------------------------------
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="section-padding bg-white border-b">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="section-padding bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
         <div className="container-custom text-center">
-          <h1 className="text-4xl font-bold mb-2">Contribute</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold mb-2 text-gray-900 dark:text-gray-100">Contribute</h1>
+          <p className="text-gray-600 dark:text-gray-400">
             Suggest new entries or corrections to existing content.
           </p>
         </div>

@@ -45,11 +45,11 @@ export default function SearchComponent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="section-padding bg-white border-b border-gray-100">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="section-padding bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
         <div className="container-custom">
           <div className="max-w-3xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-semibold text-gray-900 mb-8 text-center">
+            <h1 className="text-4xl md:text-5xl font-semibold text-gray-900 dark:text-gray-100 mb-8 text-center">
               Search
             </h1>
             <SearchBar />
@@ -61,10 +61,10 @@ export default function SearchComponent() {
         <div className="container-custom">
           {query && (
             <div className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 Results for &quot;{query}&quot;
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 Found {results.total} result{results.total !== 1 ? "s" : ""}
               </p>
             </div>
@@ -74,14 +74,14 @@ export default function SearchComponent() {
           {loading && (
             <div className="text-center py-16">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-2 border-primary-600 border-t-transparent"></div>
-              <p className="mt-4 text-gray-600">Searching...</p>
+              <p className="mt-4 text-gray-600 dark:text-gray-400">Searching...</p>
             </div>
           )}
 
           {/* No results */}
           {!loading && query && results.total === 0 && (
             <div className="card p-12 text-center">
-              <p className="text-xl text-gray-600">
+              <p className="text-xl text-gray-600 dark:text-gray-400">
                 No results found for &quot;{query}&quot;. Try a different search
                 term.
               </p>
@@ -91,8 +91,8 @@ export default function SearchComponent() {
           {/* Compounds */}
           {!loading && results.compounds.length > 0 && (
             <div className="mb-12">
-              <h3 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                <FiPackage className="w-6 h-6 text-primary-600" />
+              <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
+                <FiPackage className="w-6 h-6 text-primary-600 dark:text-primary-400" />
                 Compounds ({results.compounds.length})
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -112,8 +112,8 @@ export default function SearchComponent() {
           {/* Medicines */}
           {!loading && results.medicines.length > 0 && (
             <div className="mb-12">
-              <h3 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                <FiFileText className="w-6 h-6 text-accent-600" />
+              <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
+                <FiFileText className="w-6 h-6 text-accent-600 dark:text-accent-400" />
                 Medicines ({results.medicines.length})
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -133,7 +133,7 @@ export default function SearchComponent() {
           {/* No query */}
           {!query && !loading && (
             <div className="text-center py-16">
-              <p className="text-xl text-gray-600">
+              <p className="text-xl text-gray-600 dark:text-gray-400">
                 Enter a search term to find compounds and medicines
               </p>
             </div>

@@ -12,6 +12,7 @@ import {
   FiBell,
 } from "react-icons/fi";
 import useSWR from "swr";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -35,8 +36,10 @@ export default function AdminNav() {
         w-64
         flex-shrink-0
         bg-white
+        dark:bg-gray-900
         border-r
         border-gray-200
+        dark:border-gray-800
         flex
         flex-col
         overflow-hidden
@@ -45,7 +48,7 @@ export default function AdminNav() {
       {/* Header with logo */}
       <div className="p-4 flex items-center gap-3">
         <svg
-          className="w-8 h-8 text-primary-600 flex-shrink-0"
+          className="w-8 h-8 text-primary-600 dark:text-primary-400 flex-shrink-0"
           viewBox="0 0 40 40"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -78,9 +81,14 @@ export default function AdminNav() {
           />
         </svg>
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">Admin Panel</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Content Management</p>
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Admin Panel</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Content Management</p>
         </div>
+      </div>
+
+      {/* Theme toggle */}
+      <div className="px-4 pb-3">
+        <ThemeToggle />
       </div>
 
       {/* Navigation (scrollable) */}
@@ -95,8 +103,8 @@ export default function AdminNav() {
                 href={item.href}
                 className={`flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-colors ${
                   isActive
-                    ? "bg-primary-600 text-white"
-                    : "text-gray-700 hover:bg-gray-100"
+                    ? "bg-primary-600 dark:bg-primary-500 text-white"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`}
               >
                 <Icon className="w-5 h-5 flex-shrink-0" />
@@ -115,10 +123,10 @@ export default function AdminNav() {
       </ul>
 
       {/* Footer */}
-      <div className="p-4 border-t border-gray-200 space-y-2">
+      <div className="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
         <Link
           href="/"
-          className="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors text-sm font-medium"
+          className="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-sm font-medium"
         >
           <FiHome className="w-5 h-5 flex-shrink-0" />
           <span className="truncate">View Site</span>
@@ -126,7 +134,7 @@ export default function AdminNav() {
 
         <button
           onClick={() => signOut({ callbackUrl: "/admin/login" })}
-          className="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg hover:bg-red-50 text-red-600 transition-colors text-sm font-medium"
+          className="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition-colors text-sm font-medium"
         >
           <FiLogOut className="w-5 h-5 flex-shrink-0" />
           <span className="truncate">Logout</span>

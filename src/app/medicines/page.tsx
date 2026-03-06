@@ -36,14 +36,14 @@ export default async function MedicinesPage() {
   const medicines = await getMedicines();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="section-padding bg-white border-b border-gray-100">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="section-padding bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
         <div className="container-custom">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-semibold text-gray-900 mb-4">
+            <h1 className="text-4xl md:text-5xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
               All Medicines
             </h1>
-            <p className="text-lg text-gray-600 leading-relaxed">
+            <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
               Explore our comprehensive database of medicines and their educational information.
             </p>
           </div>

@@ -6,9 +6,9 @@ export default function MedicinesLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex bg-gray-50 min-h-screen">
+    <div className="flex bg-gray-50 dark:bg-gray-900 min-h-screen">
       <AdminNav />
-      <div className="flex-1 p-8">{children}</div>
+      <div className="flex-1 p-8 text-gray-900 dark:text-gray-100">{children}</div>
     </div>
   );
 }

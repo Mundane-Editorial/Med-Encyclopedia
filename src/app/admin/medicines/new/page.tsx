@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import toast, { Toaster } from 'react-hot-toast';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import toast, { Toaster } from "react-hot-toast";
 
 interface Compound {
   _id: string;
@@ -14,14 +14,14 @@ export default function NewMedicinePage() {
   const [loading, setLoading] = useState(false);
   const [compounds, setCompounds] = useState<Compound[]>([]);
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    compound: '',
-    brand_names: '',
-    general_usage_info: '',
-    general_dosage_info: '',
-    interactions: '',
-    safety_info: '',
+    name: "",
+    description: "",
+    compound: "",
+    brand_names: "",
+    general_usage_info: "",
+    general_dosage_info: "",
+    interactions: "",
+    safety_info: "",
   });
 
   useEffect(() => {
@@ -30,18 +30,20 @@ export default function NewMedicinePage() {
 
   const fetchCompounds = async () => {
     try {
-      const res = await fetch('/api/compounds');
+      const res = await fetch("/api/compounds");
       const data = await res.json();
       if (data.success) {
         setCompounds(data.data);
       }
     } catch (error) {
-      toast.error('Failed to fetch compounds');
+      toast.error("Failed to fetch compounds");
     }
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     setFormData({
       ...formData,
@@ -56,25 +58,25 @@ export default function NewMedicinePage() {
     try {
       const payload = {
         ...formData,
-        brand_names: formData.brand_names.split('\n').filter((s) => s.trim()),
+        brand_names: formData.brand_names.split("\n").filter((s) => s.trim()),
       };
 
-      const res = await fetch('/api/medicines', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/medicines", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       const data = await res.json();
 
       if (data.success) {
-        toast.success('Medicine created successfully!');
-        router.push('/admin/medicines');
+        toast.success("Medicine created successfully!");
+        router.push("/admin/medicines");
       } else {
-        toast.error(data.error || 'Failed to create medicine');
+        toast.error(data.error || "Failed to create medicine");
       }
     } catch (error) {
-      toast.error('An error occurred');
+      toast.error("An error occurred");
     } finally {
       setLoading(false);
     }
@@ -83,9 +85,14 @@ export default function NewMedicinePage() {
   return (
     <div>
       <Toaster position="top-right" />
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Add New Medicine</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">
+        Add New Medicine
+      </h1>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-8 max-w-4xl">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white rounded-lg shadow-md p-8 max-w-4xl"
+      >
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -215,7 +222,7 @@ export default function NewMedicinePage() {
               disabled={loading}
               className="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
             >
-              {loading ? 'Creating...' : 'Create Medicine'}
+              {loading ? "Creating..." : "Create Medicine"}
             </button>
             <button
               type="button"

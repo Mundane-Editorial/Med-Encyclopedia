@@ -11,7 +11,7 @@ import {
   SITE_DEFAULT_DESCRIPTION,
   SITE_NAME,
 } from "@/lib/seo";
-import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });

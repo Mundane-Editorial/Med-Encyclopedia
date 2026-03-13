@@ -78,40 +78,41 @@ export default function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){var t=localStorage.getItem('theme');var d=t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);})();`,
-          }}
-        />
-      </head>
       <body className={`${inter.variable} font-sans`}>
-        <script
+        {/* Theme script */}
+        <Script id="theme-script" strategy="beforeInteractive">
+          {`(function(){var t=localStorage.getItem('theme');var d=t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);})();`}
+        </Script>
+
+        {/* SEO structured data */}
+        <Script
+          id="org-jsonld"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(organizationJsonLd),
           }}
         />
-        <script
+
+        <Script
+          id="website-jsonld"
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(websiteJsonLd),
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
+
         <Providers>
           <Navbar />
           <main>{children}</main>
           <Footer />
         </Providers>
+
         <Analytics />
+
         <Script id="clarity" strategy="afterInteractive">
-          {`
-                  (function(c,l,a,r,i,t,y){
-                      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-                      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-                  })(window, document, "clarity", "script", "vrevz2crzs");
-                  `}
+          {`(function(c,l,a,r,i,t,y){
+               c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+               t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+               y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+           })(window, document, "clarity", "script", "vrevz2crzs");`}
         </Script>
       </body>
     </html>

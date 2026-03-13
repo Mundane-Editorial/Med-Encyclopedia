@@ -101,9 +101,9 @@ export default function RootLayout({
         <Providers>
           <Navbar />
           <main>{children}</main>
-          <Analytics />
           <Footer />
         </Providers>
+        <Analytics />
         <Script id="clarity" strategy="afterInteractive">
           {`
                   (function(c,l,a,r,i,t,y){
